@@ -131,6 +131,21 @@ class Annotator:
                             txt_color,
                             thickness=self.tf,
                             lineType=cv2.LINE_AA)
+        
+    def blur_label(self, box):
+        """Add one blurred region to image with label"""
+        if isinstance(box, torch.Tensor):
+            box = box.tolist()
+        x0_img, y0_img, x1_img, y1_img = int(box[0]), int(box[1]), int(box[2]), int(box[3])
+
+        # Define the region to blur
+        region_to_blur = self.im[y0_img:y1_img, x0_img:x1_img]
+
+        # Apply Gaussian blur to the region
+        blurred_region = cv2.GaussianBlur(region_to_blur, (25, 25), 0)
+
+        # Replace the original region with the blurred region
+        self.im[y0_img:y1_img, x0_img:x1_img] = blurred_region
 
     def masks(self, masks, colors, im_gpu, alpha=0.5, retina_masks=False):
         """
